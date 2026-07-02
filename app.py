@@ -18,6 +18,7 @@ from constants import (
     SETTINGS_WINDOW_GEOMETRY, SETTINGS_THEME
 )
 from styles import get_sidebar_stylesheet
+from ui.home import HomePage
 
 logger = logging.getLogger(__name__)
 
@@ -115,7 +116,10 @@ class MainWindow(QMainWindow):
     def _build_pages(self) -> QStackedWidget:
         self.stack = QStackedWidget()
         for key, label in PAGES:
-            self.stack.addWidget(PlaceholderPage(label))
+            if key == "home":
+                self.stack.addWidget(HomePage(self.dark_mode))
+            else:
+                self.stack.addWidget(PlaceholderPage(label))
         return self.stack
 
     def _restore_geometry(self) -> None:
