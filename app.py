@@ -20,6 +20,7 @@ from constants import (
 from styles import get_sidebar_stylesheet
 from ui.home import HomePage
 from preview import PreviewPanel
+from ui.convert_page import ConvertPage
 
 logger = logging.getLogger(__name__)
 
@@ -128,7 +129,7 @@ class MainWindow(QMainWindow):
         toggle_btn = QPushButton("Toggle Preview")
         toggle_btn.clicked.connect(self.toggle_preview_panel)
         layout.addWidget(toggle_btn)
-        
+
         self.nav_group.button(0).setChecked(True)  # Home selected by default
 
         return sidebar
@@ -141,6 +142,10 @@ class MainWindow(QMainWindow):
                 home_page.image_loaded.connect(self.preview_panel.load_from_path)
                 home_page.clipboard_image_loaded.connect(self.preview_panel.load_from_qimage)
                 self.stack.addWidget(home_page)
+            elif key == "convert":
+                 self.convert_page = ConvertPage(self.dark_mode)
+                 home_page.image_loaded.connect(lambda p: self.convert_page.add_files([p]))
+                 self.stack.addWidget(self.convert_page)
             else:
                 self.stack.addWidget(PlaceholderPage(label))
         return self.stack
