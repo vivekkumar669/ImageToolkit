@@ -19,6 +19,7 @@ from constants import (
 )
 from styles import get_sidebar_stylesheet
 from ui.home import HomePage
+from preview import PreviewPanel
 
 logger = logging.getLogger(__name__)
 
@@ -49,7 +50,7 @@ class PlaceholderPage(QWidget):
         label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(label)
 
-
+PAGES_WITHOUT_PREVIEW = {"settings"}
 class MainWindow(QMainWindow):
     """Top-level application window."""
 
@@ -83,8 +84,23 @@ class MainWindow(QMainWindow):
         root_layout.setContentsMargins(0, 0, 0, 0)
         root_layout.setSpacing(0)
 
+        self.preview_panel = PreviewPanel(self.dark_mode)
+        self.preview_visible = True
+
+
         root_layout.addWidget(self._build_sidebar())
         root_layout.addWidget(self._build_pages(), stretch=1)
+        root_layout.addWidget(self.preview_panel, stretch=1)
+        self.stack.currentChanged.connect(self._on_page_changed)
+    
+    def _on_page_changed(self, index: int) -> None:
+        key = PAGES[index][0]
+        should_show = self.preview_visible and key not in PAGES_WITHOUT_PREVIEW
+        self.preview_panel.setVisible(should_show)
+
+    def toggle_preview_panel(self) -> None:
+        self.preview_visible = not self.preview_visible
+        self._on_page_changed(self.stack.currentIndex())
 
     def _build_sidebar(self) -> QWidget:
         sidebar = QWidget()
@@ -109,6 +125,10 @@ class MainWindow(QMainWindow):
             layout.addWidget(btn)
 
         layout.addStretch()
+        toggle_btn = QPushButton("Toggle Preview")
+        toggle_btn.clicked.connect(self.toggle_preview_panel)
+        layout.addWidget(toggle_btn)
+        
         self.nav_group.button(0).setChecked(True)  # Home selected by default
 
         return sidebar
@@ -117,7 +137,10 @@ class MainWindow(QMainWindow):
         self.stack = QStackedWidget()
         for key, label in PAGES:
             if key == "home":
-                self.stack.addWidget(HomePage(self.dark_mode))
+                home_page = HomePage(self.dark_mode)
+                home_page.image_loaded.connect(self.preview_panel.load_from_path)
+                home_page.clipboard_image_loaded.connect(self.preview_panel.load_from_qimage)
+                self.stack.addWidget(home_page)
             else:
                 self.stack.addWidget(PlaceholderPage(label))
         return self.stack
