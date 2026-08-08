@@ -1,7 +1,4 @@
-"""
-Main application window: sidebar navigation, page switching,
-window geometry persistence, theme setup.
-"""
+
 
 import logging
 from PySide6.QtWidgets import (
@@ -21,6 +18,7 @@ from styles import get_sidebar_stylesheet
 from ui.home import HomePage
 from preview import PreviewPanel
 from ui.convert_page import ConvertPage
+from ui.resize_page import ResizePage
 
 logger = logging.getLogger(__name__)
 
@@ -146,6 +144,10 @@ class MainWindow(QMainWindow):
                  self.convert_page = ConvertPage(self.dark_mode)
                  home_page.image_loaded.connect(lambda p: self.convert_page.add_files([p]))
                  self.stack.addWidget(self.convert_page)
+            elif key == "resize":
+                self.resize_page = ResizePage(self.dark_mode)
+                home_page.image_loaded.connect(lambda p: self.resize_page.add_files([p]))
+                self.stack.addWidget(self.resize_page)
             else:
                 self.stack.addWidget(PlaceholderPage(label))
         return self.stack

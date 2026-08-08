@@ -64,9 +64,6 @@ class ConvertPage(QWidget):
 
         self._build_ui()
 
-    # ---------------------------------------------------------
-    # UI construction
-    # ---------------------------------------------------------
 
     def _build_ui(self) -> None:
         layout = QVBoxLayout(self)
@@ -123,9 +120,6 @@ class ConvertPage(QWidget):
         row.addStretch()
         return row
 
-    # ---------------------------------------------------------
-    # Public API (called from app.py)
-    # ---------------------------------------------------------
 
     def add_files(self, files: list[Path]) -> None:
         for f in files:
@@ -133,9 +127,7 @@ class ConvertPage(QWidget):
                 self.loaded_files.append(f)
                 self.file_list.addItem(f.name)
 
-    # ---------------------------------------------------------
-    # Output folder
-    # ---------------------------------------------------------
+
 
     def _change_output_folder(self) -> None:
         folder = QFileDialog.getExistingDirectory(self, "Select Output Folder", str(self.output_dir))
@@ -143,9 +135,7 @@ class ConvertPage(QWidget):
             self.output_dir = Path(folder)
             self.output_label.setText(f"Output: {self.output_dir}")
 
-    # ---------------------------------------------------------
-    # Conversion entry point
-    # ---------------------------------------------------------
+
 
     def _start_conversion(self) -> None:
         if not self.loaded_files:
